@@ -1,0 +1,15 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    Lms\Shared\:
+        resource: '../../'
+        exclude:
+            - '../../DependencyInjection/'
+            - '../../LmsSharedBundle.php'
+            - '../../Resources/'
+
+    Lms\Shared\EventSubscriber\ApiExceptionSubscriber:
+        arguments:
+            $debug: '%kernel.debug%'
