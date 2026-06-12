@@ -9,7 +9,7 @@ trait BaseLogTrait
 {
     private LoggerInterface $logger;
 
-    /** @required */
+    #[Required]
     public function setLogger(LoggerInterface $logger): void
     {
         $this->logger = $logger;
