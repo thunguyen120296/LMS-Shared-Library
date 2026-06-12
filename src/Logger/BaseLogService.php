@@ -5,27 +5,29 @@ namespace Lms\Shared\Logger;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 
-trait BaseLogTrait
+final class BaseLogService
 {
-    private LoggerInterface $logger;
+    public function __construct(
+        private readonly LoggerInterface $logger,
+        private readonly ?string $service = null,
+    ) {}
 
-    #[Required]
-    public function setLogger(LoggerInterface $logger): void
+    public function for(string $service): self
     {
-        $this->logger = $logger;
+        return new self($this->logger, $service);
     }
 
-    protected function logInfo(string $message, ?LogContext $context = null): void
+    public function info(string $message, ?LogContext $context = null): void
     {
         $this->log(LogLevel::INFO, $message, $context);
     }
 
-    protected function logWarning(string $message, ?LogContext $context = null): void
+    public function warning(string $message, ?LogContext $context = null): void
     {
         $this->log(LogLevel::WARNING, $message, $context);
     }
 
-    protected function logError(string $message, ?\Throwable $e = null, ?LogContext $context = null): void
+    public function error(string $message, ?\Throwable $e = null, ?LogContext $context = null): void
     {
         $extra = $context?->extra ?? [];
         if ($e !== null) {
@@ -35,7 +37,7 @@ trait BaseLogTrait
         }
 
         $this->log(LogLevel::ERROR, $message, new LogContext(
-            service: $context?->service ?? static::class,
+            service: $context?->service ?? $this->service,
             action: $context?->action,
             correlationId: $context?->correlationId,
             userId: $context?->userId,
@@ -45,7 +47,7 @@ trait BaseLogTrait
 
     private function log(string $level, string $message, ?LogContext $context = null): void
     {
-        $ctx = ($context ?? new LogContext(service: static::class))->toArray();
+        $ctx = ($context ?? new LogContext(service: $this->service))->toArray();
         $this->logger->log($level, $message, $ctx);
     }
 }

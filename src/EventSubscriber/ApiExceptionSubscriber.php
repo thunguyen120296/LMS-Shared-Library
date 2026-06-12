@@ -4,6 +4,8 @@ namespace Lms\Shared\EventSubscriber;
 
 use Lms\Shared\Dto\ApiResponse;
 use Lms\Shared\Exception\ApiException;
+use Lms\Shared\Logger\BaseLogService;
+use Lms\Shared\Logger\LogContext;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,7 +17,7 @@ class ApiExceptionSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly bool $debug = false,
-        private readonly ?LoggerInterface $logger = null,
+        private readonly ?BaseLogService $logger = null,
     ) {}
 
     public static function getSubscribedEvents(): array
@@ -40,11 +42,14 @@ class ApiExceptionSubscriber implements EventSubscriberInterface
         ));
 
         if ($statusCode >= 500 && $this->logger !== null) {
-            $this->logger->error($exception->getMessage(), [
-                'exception' => $exception::class,
-                'path' => $event->getRequest()->getPathInfo(),
-                'trace' => $exception->getTraceAsString(),
-            ]);
+            $this->logger->for(self::class)->error(
+                $exception->getMessage(),
+                $exception,
+                new LogContext(
+                    action: 'api.exception',
+                    extra: ['path' => $event->getRequest()->getPathInfo()],
+                ),
+            );
         }
     }
 
