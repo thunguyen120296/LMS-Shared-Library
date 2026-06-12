@@ -17,9 +17,9 @@ final class LogContext
         return array_filter([
             'service' => $this->service,
             'action' => $this->action,
-            'correlationId' => $this->correlationId,
-            'userId' => $this->userId,
-            'extra' => $this->extra,
-        ], fn($value) => $value !== null);
+            'correlation_id' => $this->correlationId,
+            'user_id' => $this->userId,
+            ...($this->extra ?? []),
+        ], fn ($v) => $v !== null);
     }
 }
