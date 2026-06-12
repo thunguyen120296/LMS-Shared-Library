@@ -15,6 +15,7 @@ class ApiExceptionSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly bool $debug = false,
+        private readonly ?LoggerInterface $logger = null,
     ) {}
 
     public static function getSubscribedEvents(): array
@@ -37,6 +38,14 @@ class ApiExceptionSubscriber implements EventSubscriberInterface
             $this->buildPayload($exception, $statusCode),
             $statusCode,
         ));
+
+        if ($statusCode >= 500 && $this->logger !== null) {
+            $this->logger->error($exception->getMessage(), [
+                'exception' => $exception::class,
+                'path' => $event->getRequest()->getPathInfo(),
+                'trace' => $exception->getTraceAsString(),
+            ]);
+        }
     }
 
     private function isApiRequest(Request $request): bool
