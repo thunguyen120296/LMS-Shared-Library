@@ -1,12 +1,5 @@
 {
     "name": "thunla/lms-shared-library",
-    "description": "Shared library for LMS",
-    "authors": [
-        {
-            "name": "Thunla",
-            "email": "thunla1202@gmail.com"
-        }
-    ],
     "type": "library",
     "license": "proprietary",
     "require": {
@@ -19,11 +12,6 @@
     },
     "config": {
         "sort-packages": true
-    },
-    "extra": {
-        "symfony": {
-            "bundle": "Lms\\Shared\\LmsSharedBundle"
-        }
     },
     "autoload": {
         "psr-4": {
