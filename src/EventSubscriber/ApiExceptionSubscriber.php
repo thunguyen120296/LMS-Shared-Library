@@ -4,6 +4,7 @@ namespace Lms\Shared\EventSubscriber;
 
 use Lms\Shared\Dto\ApiResponse;
 use Lms\Shared\Exception\ApiException;
+use Lms\Shared\Http\ApiStatusCode;
 use Lms\Shared\Logger\BaseLogService;
 use Lms\Shared\Logger\LogContext;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -41,7 +42,7 @@ class ApiExceptionSubscriber implements EventSubscriberInterface
             $statusCode,
         ));
 
-        if ($statusCode >= 500 && $this->logger !== null) {
+        if ($statusCode >= ApiStatusCode::INTERNAL_SERVER_ERROR && $this->logger !== null) {
             $this->logger->for(self::class)->error(
                 $exception->getMessage(),
                 $exception,
@@ -76,7 +77,7 @@ class ApiExceptionSubscriber implements EventSubscriberInterface
             return $exception->getStatusCode();
         }
 
-        return 500;
+        return ApiStatusCode::INTERNAL_SERVER_ERROR;
     }
 
     private function buildPayload(\Throwable $exception, int $statusCode): array
@@ -102,7 +103,7 @@ class ApiExceptionSubscriber implements EventSubscriberInterface
 
     private function resolveMessage(\Throwable $exception, int $statusCode): string
     {
-        if ($statusCode >= 500 && !$this->debug) {
+        if ($statusCode >= ApiStatusCode::INTERNAL_SERVER_ERROR && !$this->debug) {
             return 'Internal Server Error';
         }
 
